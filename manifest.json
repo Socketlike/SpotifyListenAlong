@@ -1,16 +1,16 @@
 {
-  "id": "dev.replugged.PluginTemplate",
-  "name": "Plugin Template",
-  "description": "A plugin template",
+  "id": "lib.evelyn.SpotifyListenAlong",
+  "name": "SpotifyListenAlong",
+  "description": "Port of the BetterDiscord plugin of the same name",
   "author": {
-    "name": "replugged",
-    "discordID": "1000992611840049192",
-    "github": "replugged-org"
+    "name": "Evelyn",
+    "discordID": "285329659023851520",
+    "github": "Socketlike"
   },
-  "version": "1.0.2",
+  "version": "1.0.0",
   "updater": {
     "type": "github",
-    "id": "replugged-org/plugin-template"
+    "id": "Socketlike/SpotifyListenAlong"
   },
   "license": "MIT",
   "type": "replugged-plugin",

@@ -1,7 +1,7 @@
 {
-  "name": "plugin-template",
+  "name": "SpotifyListenAlong",
   "version": "1.0.0",
-  "description": "A plugin template",
+  "description": "Port of the BetterDiscord plugin of the same name",
   "engines": {
     "node": ">=14.0.0"
   },
@@ -20,7 +20,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@electron/asar": "^3.2.1",
     "@fal-works/esbuild-plugin-global-externals": "^2.1.2",

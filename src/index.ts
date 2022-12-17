@@ -1,22 +1,29 @@
 import { Injector, webpack } from "replugged";
+import { SpotifyActiveSocketAndDevice } from "./types";
 
 const inject = new Injector();
 
 export async function start(): Promise<void> {
-  const typingMod = await webpack.waitForModule<{
-    startTyping: (channelId: string) => void;
-  }>(webpack.filters.byProps("startTyping"));
-  const getChannelMod = await webpack.waitForModule<{
-    getChannel: (id: string) => {
-      name: string;
-    };
-  }>(webpack.filters.byProps("getChannel"));
+  let spotify = await webpack.waitForModule<{
+    getActiveSocketAndDevice: () => SpotifyActiveSocketAndDevice | undefined;
+  }>(webpack.filters.byProps("getActiveSocketAndDevice"));
 
-  if (typingMod && getChannelMod) {
-    inject.instead(typingMod, "startTyping", ([channel]) => {
-      const channelObj = getChannelMod.getChannel(channel);
-      console.log(`Typing prevented! Channel: #${channelObj?.name ?? "unknown"} (${channel}).`);
-    });
+  if (spotify) {
+    inject.after(
+      spotify,
+      "getActiveSocketAndDevice",
+      (
+        _funcArgs: void[],
+        data: SpotifyActiveSocketAndDevice | undefined,
+        _self: Record<string, unknown>,
+      ) => {
+        if (data?.socket) data.socket.isPremium = true;
+        return data;
+      },
+    );
+    console.log("%c[SpotifyListenAlong]", "color: #5865F2", "Loaded", spotify);
+  } else {
+    console.error("%c[SpotifyListenAlong]", "color: #5865F2", "Something went wrong", spotify);
   }
 }
 
