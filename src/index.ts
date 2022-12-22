@@ -1,12 +1,10 @@
-import { Injector, webpack } from "replugged";
+import { Injector, common, logger } from "replugged";
 import { SpotifyActiveSocketAndDevice } from "./types";
 
 const inject = new Injector();
 
 export async function start(): Promise<void> {
-  let spotify = await webpack.waitForModule<{
-    getActiveSocketAndDevice: () => SpotifyActiveSocketAndDevice | undefined;
-  }>(webpack.filters.byProps("getActiveSocketAndDevice"));
+  let spotify = common.spotifySocket;
 
   if (spotify) {
     inject.after(
@@ -21,9 +19,9 @@ export async function start(): Promise<void> {
         return data;
       },
     );
-    console.log("%c[SpotifyListenAlong]", "color: #5865F2", "Loaded", spotify);
+    logger.log('SpotifyListenAlong', undefined, 'Injected into spotifySocket', spotify)
   } else {
-    console.error("%c[SpotifyListenAlong]", "color: #5865F2", "Something went wrong", spotify);
+    logger.error("TypeError", "SpotifyListenAlong", "spotifySocket is nullish", spotify);
   }
 }
 
