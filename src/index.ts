@@ -1,7 +1,8 @@
-import { Injector, common, logger } from "replugged";
+import { Injector, common, Logger } from "replugged";
 import { SpotifyActiveSocketAndDevice } from "./types";
 
 const inject = new Injector();
+const logger = new Logger('Injector', 'SpotifyListenAlong');
 
 export async function start(): Promise<void> {
   let spotify = common.spotifySocket;
@@ -19,9 +20,9 @@ export async function start(): Promise<void> {
         return data;
       },
     );
-    logger.log('SpotifyListenAlong', undefined, 'Injected into spotifySocket', spotify)
+    logger.log('Injected into spotifySocket', spotify)
   } else {
-    logger.error("TypeError", "SpotifyListenAlong", "spotifySocket is nullish", spotify);
+    logger.error('spotifySocket is nullish', spotify);
   }
 }
 
