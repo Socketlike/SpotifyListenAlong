@@ -1,2 +1,2 @@
 # SpotifyListenAlong
-Port of the BetterDiscord plugin of the same name
+Post-SWC Replugged port of the BetterDiscord plugin of the same name
