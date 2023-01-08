@@ -1,26 +1,62 @@
-import { Injector, common, Logger } from "replugged";
+import { Injector, Logger, common, webpack } from "replugged";
 
-const inject = new Injector();
-const logger = new Logger("Injector", "SpotifyListenAlong");
+interface FluxDispatcher {
+  subscribe: (name: string, callback: (...args: unknown[]) => void) => void;
+  unsubscribe: (name: string, callback: (...args: unknown[]) => void) => void;
+}
 
-export async function start(): Promise<void> {
-  let spotify = common.spotifySocket;
+interface SpotifySocket {
+  getActiveSocketAndDevice: () => void | {
+    socket: {
+      isPremium: boolean;
+    };
+  };
+}
 
-  if (spotify) {
-    inject.after(
-      spotify,
+const injector = new Injector();
+let socket: void | SpotifySocket;
+let injected = false;
+const logger = Logger.plugin("SpotifyListenAlong");
+
+export const injectionHandler = async (): Promise<void> => {
+  if (!socket)
+    socket = (await webpack.waitForModule(
+      webpack.filters.byProps("getActiveSocketAndDevice"),
+    )) as unknown as SpotifySocket;
+  if (!socket) {
+    logger.error("SpotifySocket not found");
+  } else if (!injected) {
+    injector.after(
+      socket,
       "getActiveSocketAndDevice",
-      (_args: void[], data: Record<string, unknown> | undefined) => {
-        if (data?.socket) data.socket.isPremium = true;
-        return data;
+      (_args: void[], res: void | { socket: { isPremium: boolean } }) => {
+        if (!res) return;
+        res.socket.isPremium = true;
+        return res;
       },
     );
-    logger.log("Injected into spotifySocket", spotify);
-  } else {
-    logger.error("spotifySocket is nullish", spotify);
+    injected = true;
   }
+};
+
+export async function start(): Promise<void> {
+  socket = (await webpack.waitForModule(
+    webpack.filters.byProps("getActiveSocketAndDevice"),
+  )) as unknown as SpotifySocket;
+
+  await injectionHandler();
+
+  if (!injected)
+    (common.fluxDispatcher as unknown as FluxDispatcher).subscribe(
+      "SPOTIFY_PLAYER_STATE",
+      injectionHandler,
+    );
 }
 
 export function stop(): void {
-  inject.uninjectAll();
+  (common.fluxDispatcher as unknown as FluxDispatcher).unsubscribe(
+    "SPOTIFY_PLAYER_STATE",
+    injectionHandler,
+  );
+  injector.uninjectAll();
 }
