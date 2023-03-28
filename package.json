@@ -1,6 +1,6 @@
 {
   "name": "SpotifyListenAlong",
-  "version": "1.0.2",
+  "version": "v1.0.4",
   "description": "Post-SWC Replugged port of the BetterDiscord plugin of the same name",
   "engines": {
     "node": ">=18.0.0"
