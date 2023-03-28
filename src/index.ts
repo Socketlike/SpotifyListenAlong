@@ -1,62 +1,54 @@
-import { Injector, Logger, common, webpack } from "replugged";
+import { Injector, Logger, common, types, webpack } from 'replugged';
 
-interface FluxDispatcher {
-  subscribe: (name: string, callback: (...args: unknown[]) => void) => void;
-  unsubscribe: (name: string, callback: (...args: unknown[]) => void) => void;
-}
-
-interface SpotifySocket {
-  getActiveSocketAndDevice: () => void | {
-    socket: {
-      isPremium: boolean;
-    };
+type GetActiveSocketAndDeviceRes = void | {
+  socket: {
+    isPremium: boolean;
   };
+};
+
+/* Only typing what is needed - this is not the full store */
+interface SpotifyStore extends types.RawModule {
+  getActiveSocketAndDevice: () => GetActiveSocketAndDeviceRes;
 }
 
 const injector = new Injector();
-let socket: void | SpotifySocket;
+let store: SpotifyStore;
 let injected = false;
-const logger = Logger.plugin("SpotifyListenAlong");
+const logger = Logger.plugin('SpotifyListenAlong');
 
-export const injectionHandler = async (): Promise<void> => {
-  if (!socket)
-    socket = (await webpack.waitForModule(
-      webpack.filters.byProps("getActiveSocketAndDevice"),
-    )) as unknown as SpotifySocket;
-  if (!socket) {
-    logger.error("SpotifySocket not found");
-  } else if (!injected) {
-    injector.after(
-      socket,
-      "getActiveSocketAndDevice",
-      (_args: void[], res: void | { socket: { isPremium: boolean } }) => {
-        if (!res) return;
-        res.socket.isPremium = true;
-        return res;
-      },
-    );
+const getStore = async (): Promise<void> => {
+  if (store) return;
+
+  store = await webpack.waitForModule<SpotifyStore>(
+    webpack.filters.byProps('getActiveSocketAndDevice'),
+  );
+
+  if (!store) throw new TypeError('Cannot get Spotify store');
+};
+
+const storeInjectHandler = async (): Promise<void> => {
+  if (injected) return;
+
+  try {
+    await getStore();
+
+    injector.after(store, 'getActiveSocketAndDevice', (_, res): GetActiveSocketAndDeviceRes => {
+      if (res?.socket) res.socket.isPremium = true;
+      return res;
+    });
+
     injected = true;
+  } catch (e) {
+    logger.error('Cannot get Spotify store; will try again at Spotify state change', e);
   }
 };
 
 export async function start(): Promise<void> {
-  socket = (await webpack.waitForModule(
-    webpack.filters.byProps("getActiveSocketAndDevice"),
-  )) as unknown as SpotifySocket;
-
-  await injectionHandler();
-
-  if (!injected)
-    (common.fluxDispatcher as unknown as FluxDispatcher).subscribe(
-      "SPOTIFY_PLAYER_STATE",
-      injectionHandler,
-    );
+  await storeInjectHandler();
+  common.fluxDispatcher.subscribe('SPOTIFY_PLAYER_STATE', storeInjectHandler);
 }
 
-export function stop(): void {
-  (common.fluxDispatcher as unknown as FluxDispatcher).unsubscribe(
-    "SPOTIFY_PLAYER_STATE",
-    injectionHandler,
-  );
+export async function stop(): Promise<void> {
+  common.fluxDispatcher.unsubscribe('SPOTIFY_PLAYER_STATE', storeInjectHandler);
   injector.uninjectAll();
 }
