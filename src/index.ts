@@ -13,7 +13,7 @@ const injector = new Injector();
 let store: SpotifyStore;
 let injected: boolean;
 
-const getStore = async (): Promise<boolean> =>
+export const getStore = async (): Promise<boolean> =>
   Boolean(
     store ||
       (store = await webpack.waitForModule<SpotifyStore>(
@@ -21,7 +21,7 @@ const getStore = async (): Promise<boolean> =>
       )),
   );
 
-const inject = async (): Promise<void> => {
+export const start = async (): Promise<void> => {
   if (!injected && (await getStore())) {
     injector.after(store, 'getActiveSocketAndDevice', (_, res) => {
       if (res?.socket) res.socket.isPremium = true;
@@ -31,7 +31,5 @@ const inject = async (): Promise<void> => {
     injected = true;
   }
 };
-
-export const start = inject;
 
 export const stop = (): void => injector.uninjectAll();
