@@ -1,7 +1,7 @@
 {
   "id": "lib.evelyn.SpotifyListenAlong",
   "name": "SpotifyListenAlong",
-  "description": "A Post-SWC Replugged Plugin that allows you to use the \"Listen along\" feature without Spotify Premium, because Spotify Premium is not actually required",
+  "description": "A Post-SWC Replugged plugin that allows you to use the \"Listen along\" feature without Spotify Premium, because Spotify Premium is not actually required",
   "author": {
     "name": "Evelyn",
     "discordID": "285329659023851520",
