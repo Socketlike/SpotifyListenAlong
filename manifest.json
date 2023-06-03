@@ -9,8 +9,8 @@
   },
   "version": "1.0.51",
   "updater": {
-    "type": "github",
-    "id": "Socketlike/SpotifyListenAlong"
+    "type": "store",
+    "id": "lib.evelyn.SpotifyListenAlong"
   },
   "license": "MIT",
   "type": "replugged-plugin",
