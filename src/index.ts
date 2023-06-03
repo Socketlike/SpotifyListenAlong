@@ -29,7 +29,7 @@ export const inject = async (): Promise<void> => {
 
   if (!injected) {
     logger.log('Store is not injected. Next attempt in 20 seconds.');
-    setInterval(inject, 20e3);
+    setTimeout(inject, 20e3);
   } else logger.log(`Injected; Took ${performance.now() - startTime}ms.`);
 };
 
