@@ -12,7 +12,7 @@
   </a>
 </p>
 <p align="center">
-  <a href="https://replugged.dev/install?identifier=Socketlike/SpotifyListenAlong&source=github">
+  <a href="https://replugged.dev/install?identifier=lib.evelyn.SpotifyListenAlong">
     <img alt="install" src="https://img.shields.io/github/v/release/Socketlike/SpotifyListenAlong?label=Install&sort=semver&style=for-the-badge">
   </a>
 </p>
