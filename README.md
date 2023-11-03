@@ -16,3 +16,6 @@
     <img alt="install" src="https://img.shields.io/github/v/release/Socketlike/SpotifyListenAlong?label=Install&sort=semver&style=for-the-badge">
   </a>
 </p>
+
+> **Warning**
+> This plugin has moved to [**Socketlike/replugged-plugins**](https://github.com/Socketlike/replugged-plugins)
